@@ -1,7 +1,14 @@
+
 # Scripts de NPCs para brAthena
 
 #### Sobre
 Criei este repositório com o objetivo de revisar e disponibilizar alguns NPCs para brAthena. Sempre que der tempo, claro!
+
+**Todos os NPCs são disponibilizados "como estão"! Livre de garantias de funcionamento!**
+
+- Para dúvidas de instalação/utilização, você pode obter suporte na [comunidade do brAthena](https://forum.brathena.org).
+
+- Em casos de problemas/erros em algum script disponibilizado aqui, você pode [informar aqui](https://github.com/lipespry/brAthena-NPCs/issues). E se você sabe a solução, pode [fazer uma contribuição aqui](#contribuicao).
 
 ---
 
@@ -18,8 +25,10 @@ O critério básico é **provar, por meio de fontes confiáveis, o autor**.
 
 ---
 
+<div id="contribuicao"></div>
+
 ##### Contribuições
-Manja de scripts de NPCs? Você pode contribuir nas revisões e inclusão de novos NPCs aqui! Aliás, sua contribuição será muito bem-vinda!
+Manja de scripts de NPCs? Você pode [contribuir nas revisões e inclusão de novos NPCs aqui](https://github.com/lipespry/brAthena-NPCs/pulls)! Aliás, sua contribuição será muito bem-vinda!
 
 ---
 
