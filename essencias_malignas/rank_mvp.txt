@@ -1,0 +1,37 @@
+-	script	Ranking MVP#regkill::rank_mvp_kill	FAKE_NPC,{ end;
+
+	OnNPCKillEvent:
+	setarray .@monsterID[0],1038,1039,1046,1059,1086,1087,1112,1115,1147,1150,1157,1159,1190,1251,1252,1272,1312,1373,1399,1418,1492,1502,1511,1583,1623,1630,1685,1688,1708,1719,1734,1751,1768,1779,1785,1832,1871,1874,1885,1917,1980,2022,2068; // ID Dos Boss
+	for(set .@a,0; .@a <= getarraysize(.@monsterID); set .@a,.@a+1)
+	if(killedrid == .@monsterID[.@a])
+	{
+		set .@CID,getcharid(0);
+		set .@name$,"";
+		set @points,0;
+		query_sql "SELECT `pontos_mvp` FROM `rank_mvp` WHERE `char_id`="+.@CID+"",@points;
+		query_sql "SELECT `char_name` FROM `rank_mvp` WHERE `char_id`="+.@CID+"",.@name$;
+		if ( .@name$ == "" ) { query_sql "INSERT INTO `rank_mvp` (`char_id`,`char_name`,`pontos_mvp`) VALUES ("+.@CID+",'"+strcharinfo(0)+"',1)",.@esc$; end; }
+		query_sql "UPDATE `rank_mvp` SET `pontos_mvp` = `pontos_mvp` + 1 WHERE `char_id`="+.@CID+"",.@esc$;
+		set @points,@points+1;
+		set #essencias_malignas,#essencias_malignas+(rand(1,5));
+		dispbottom "Parabéns "+strcharinfo(0)+", você acaba de ganhar mais um ponto de MvP kill! Agora você possui "+@points+" pontos.";
+		end;
+	}
+}
+
+
+prontera,172,140,1	script	Ranking MVP#rank::rank_mvp	MOB_TOMB,{
+	
+	query_sql "SELECT char_name, pontos_mvp FROM rank_mvp ORDER BY pontos_mvp DESC LIMIT 10",.@char_name$,.@pontos_mvp;
+	dispbottom "Pos.  Nome:  Matou: ";
+	dispbottom " ";
+	for(set .@i,0;.@i<=9;set .@i,.@i+1)
+	{
+		if(!.@pontos_mvp[.@i]) continue;
+		dispbottom "["+(.@i+1)+"] Nome: ["+.@char_name$[.@i]+"] Matou: ["+.@pontos_mvp[.@i]+" MVPs.]";
+	}
+	end;;
+
+OnInit: 
+	end;
+}
