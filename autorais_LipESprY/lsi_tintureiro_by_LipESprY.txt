@@ -1,0 +1,213 @@
+//_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_//
+//... ___.....LSI...........________.......______..................__..__..........//
+//.../\  \................./\  _____\...../ _____\......LSI......./\ \ \ \.........//
+//...\ \_ \.......__  _____\ \ \____/..../\ \____/ ______  __  ___\ \ \_\ \....LSI.//
+//....\//\ \...../\_\/\  __ \ \ \_____...\ \ \____/\  __ \/\ \/ ___\ \____ \.......//
+//......\ \ \....\/\ \ \ \/ /\ \  ____\...\ \____ \ \ \/ /\ \  /___/\/____\ \......//
+//.......\ \ \..._\ \ \ \  /..\ \ \___/....\/____\ \ \  /..\ \ \.........\ \ \.....//
+//..LSI...\_\ \__\ \ \ \ \ \...\ \ \______....____\ \ \ \...\ \ \.......__\_\ \....//
+//......../\________\ \_\ \_\...\ \_______\../\_____/\ \_\...\ \ \...../\_____/....//
+//........\/________/\/_/\/_/....\/_______/..\/____/..\/_/....\/_/.....\/____/.....//
+//¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯//
+//      LSI          Felipe Moraes - felipemdeoliveira@live.com          LSI       //
+//¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯//
+
+-	shop	lsi_tintureiroShop	FAKE_NPC,909:-1
+
+prontera, 166, 221, 4	script	Tintureiro Likeaboss::lsi_tintureiro	4_ELEPHANT,{
+	function addShopItem; function getPreco; function getItemIndex; goto(OnClique);
+
+OnInit:
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// CONFIGURAÇÕES
+	/////////////////////////////////////////////////////////////////////////////////////////////
+
+	// Nome do NPC
+	set .npcNome$, "[^0000f9"+strnpcinfo(0)+"^000000]";
+
+	// Lista de tintas (ids)
+	setarray .shopItens, 		975, 	976, 	978, 	979, 	980, 	981, 	982, 	983, 	973, 	974; // ...
+
+	// Preços das tintas (zenys)
+	setarray .shopItensPreco, 	3000, 	3000, 	3500, 	5000, 	5000, 	5000, 	3000, 	7000, 	3000, 	4000; // ...
+
+	// Requerimentos das tintas seguidos da quantidade
+	setarray .item0Req,	507,	973,	713;
+	setarray .item0Qnt,	30,		1,		1;
+
+	setarray .item1Req,	508,	973,	713;
+	setarray .item1Qnt,	30,		1,		1;
+
+	setarray .item2Req,	510,	973,	713;
+	setarray .item2Qnt,	20,		1,		1;
+
+	setarray .item3Req,	510,	511,	508,	973,	974,	713;
+	setarray .item3Qnt,	5,		20,		20,		1,		1,		1;
+
+	setarray .item4Req,	507,	508,	973,	974,	713;
+	setarray .item4Qnt,	20,		20,		1,		1,		1;
+
+	setarray .item5Req,	510,	507,	973,	974,	713;
+	setarray .item5Qnt,	10,		30,		1,		1,		1;
+
+	setarray .item6Req,	509,	973,	713;
+	setarray .item6Qnt,	30,		1,		1;
+
+	setarray .item7Req,	507,	508,	511,	510,	973,	974,	713;
+	setarray .item7Qnt,	30,		30,		30,		5,		1,		1,		1;
+
+	setarray .item8Req,	970,	971,	713;
+	setarray .item8Qnt,	1,		1,		1;
+
+	setarray .item9Req,	970,	972,	713;
+	setarray .item9Qnt,	1,		1,		1;
+
+	// setarray .item10Req,	970,	972,	713;
+	// setarray .item10Qnt,	1,		1,		1;
+	// ...
+
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// FIM DAS CONFIGURAÇÕES
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	addShopItem();
+	end;
+
+
+OnClique:
+	callshop("lsi_tintureiroShop", 1);
+	dispbottom "Aqui você pode fazer várias tinturas de uma só vez!";
+	npcshopattach("lsi_tintureiroShop",true);
+	end;
+
+OnBuyItem:
+	set .@custoTotal, 0;
+	set .@pesoTotal, 0;
+	mes .npcNome$;
+	mes "Lista de tarefas:";
+	mes "---------------------";
+	freeloop(1);
+	for (.@i = 0; .@i < getarraysize(@bought_nameid); .@i++) {
+		.@valor = (getPreco(@bought_nameid[.@i]) * @bought_quantity[.@i]);
+		set .@peso, (( getiteminfo(@bought_nameid[.@i], 6) / 10 ) * @bought_quantity[.@i]);
+		set .@itemIndex, getItemIndex(@bought_nameid[.@i]);
+
+		mes "^DD0000"+@bought_quantity[.@i]+"^000000x ^0000AA"+getitemname(@bought_nameid[.@i])+"^000000";
+		mes "Preço: ^AAAA00"+getPreco(@bought_nameid[.@i])+" [Zenys]^000000/cada";
+		mes "Total: ^00DD00"+.@valor+" [Zenys]^000000";
+		mes "Requerimentos (Total):";
+		mes "---------------------";
+		for (.@j = 0; .@j < getarraysize(getd(".item"+(.@itemIndex)+"Req")); .@j++) {
+			// DEFININDO ITEMS REQUERIDOS
+			setd(".@itemReq_"+.@i+"_"+.@j, getelementofarray(getd(".item"+(.@itemIndex)+"Req"), .@j));
+			// DEFININDO QUANTIDADE DO ITEM REQUERIDO
+			setd(".@itemQnt_"+.@i+"_"+.@j, (getelementofarray(getd(".item"+(.@itemIndex)+"Qnt"), .@j) * @bought_quantity[.@i]));
+			mes "^AAAA00"+(getd(".@itemQnt_"+.@i+"_"+.@j))+"^000000x ^AAAA00"+getitemname(getd(".@itemReq_"+.@i+"_"+.@j))+"^000000";
+		}
+		// DEFININDO ZENY REQUERIDO
+		setd(".@itemPre_"+.@i, .@valor);
+		mes "---------------------";
+		.@custoTotal += .@valor;
+		.@pesoTotal += .@peso;
+	}
+	freeloop(0);
+	mes "Serão necessários ^00b900"+.@custoTotal+" Zenys^000000 para fazer todas as tinturas!";
+	mes "Posso executar as tarefas?";
+	next;
+	if(select("~> Fazer tinturas:~> Cancelar") == 2) {
+		mes .npcNome$;
+		mes "Okay...";
+		mes "Volte quando precisar de meus serviços.";
+		mes " ";
+		mes "Desenvolvido por ^0000b9LipESprY^000000";
+		mes "Baseado nos requísitos do ^0000b9ratemyserver.net^000000";
+		close;
+	}
+	getinventorylist;
+	mes .npcNome$;
+	if (@inventorylist_count >= 90) {
+		mes "^ff0000Você tem muitos itens no inventário!^000000";
+		mes "Por segurança, guarde alguns itens e tente novamente.";
+		close;
+	}
+	mes "Então mãos à obra...";
+	freeloop(1);
+	for (.@i = 0; .@i < getarraysize(@bought_nameid); .@i++) {
+		progressbar("003f00", 2);
+		set .@peso, (( getiteminfo(@bought_nameid[.@i], 6) / 10 ) * @bought_quantity[.@i]);
+		set .@itemIndex, getItemIndex(@bought_nameid[.@i]);
+		// ZENY REQUERIDO
+		getd(".@itemPre_"+.@i);
+		if(Zeny < getd(".@itemPre_"+.@i)) {
+			mes "^b90000Erro ao fazer ["+@bought_quantity[.@i]+"x "+getitemname(@bought_nameid[.@i])+"]!^000000";
+			mes "^b90000Você não tem ["+getd(".@itemPre_"+.@i)+" Zenys]^000000.";
+			close;
+		} else
+		if(.@peso > (MaxWeight-Weight)) {
+			mes "^b90000Erro ao fazer ["+@bought_quantity[.@i]+"x "+getitemname(@bought_nameid[.@i])+"]!^000000";
+			mes "^b90000Você não tem ["+.@peso+" de carga]^000000.";
+			mes "Carga disponível: ^ff0000"+((MaxWeight-Weight)/10)+"/"+(.@peso)+"^000000";
+			close;
+		}
+		for (.@j = 0; .@j < getarraysize(getd(".item"+(.@itemIndex)+"Req")); .@j++) {
+			if(countitem(getd(".@itemReq_"+.@i+"_"+.@j)) < getd(".@itemQnt_"+.@i+"_"+.@j)) {
+				mes "^b90000Erro ao fazer ["+@bought_quantity[.@i]+"x "+getitemname(@bought_nameid[.@i])+"]!^000000";
+				mes "^b90000Você não tem ["+getd(".@itemQnt_"+.@i+"_"+.@j)+"x "+getitemname(getd(".@itemReq_"+.@i+"_"+.@j))+"]^000000.";
+				close;
+			}
+		}
+		for (.@k = 0; .@k < getarraysize(getd(".item"+(.@itemIndex)+"Req")); .@k++) {
+			delitem(getd(".@itemReq_"+.@i+"_"+.@k), getd(".@itemQnt_"+.@i+"_"+.@k));
+		}
+		set Zeny, (Zeny - getd(".@itemPre_"+.@i));
+		getitem(@bought_nameid[.@i], @bought_quantity[.@i]);
+		mes "^00b900"+@bought_quantity[.@i]+"x "+getitemname(@bought_nameid[.@i])+" feitos com sucesso!^000000";
+		specialeffect(492);
+	}
+	freeloop(0);
+	next;
+	mes .npcNome$;
+	mes "^00ff00Tudo PRONTO!^000000";
+	mes "Volte caso precise dos meus serviços novamente.";
+	close;
+
+	function addShopItem {
+		freeloop(1);
+		for (.@i = 0; .@i < getarraysize(.shopItens); .@i++) {
+			if (getitemname(.shopItens[.@i]) == "null") {
+				debugmes "[LSI] Tintureiro Likeaboss: Item "+.shopItens[.@i]+" não existe!";
+			} else {
+				npcshopadditem("lsi_tintureiroShop", .shopItens[.@i], 0);
+			}
+		}
+		freeloop(0);
+		npcshopdelitem("lsi_tintureiroShop",909);
+		return;
+	}
+
+	function getPreco {
+		set .@itemId, getarg(0);
+		for (.@i = 0; .@i < getarraysize(.shopItens); .@i++) {
+			if (.shopItens[.@i] == .@itemId) {
+				set .@preco, .shopItensPreco[.@i];
+			}
+		}
+		if (.@preco <= 0) {
+			debugmes "[LSI] Tintureiro Likeaboss: Preço do item "+.@itemId+" não encontrado!";
+			mes "Erro na execução do script!";
+			mes "Informe à algum Game Master";
+			close;
+		}
+		return .@preco;
+	}
+
+	function getItemIndex {
+		set .@itemId, getarg(0);
+		for (.@i = 0; .@i < getarraysize(.shopItens); .@i++) {
+			if (.shopItens[.@i] == .@itemId) {
+				set .@index, .@i;
+			}
+		}
+		return .@index;
+	}
+
+}

@@ -1,0 +1,110 @@
+//_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_//
+//... ___.....LSI...........________.......______..................__..__..........//
+//.../\  \................./\  _____\...../ _____\......LSI......./\ \ \ \.........//
+//...\ \_ \.......__  _____\ \ \____/..../\ \____/ ______  __  ___\ \ \_\ \....LSI.//
+//....\//\ \...../\_\/\  __ \ \ \_____...\ \ \____/\  __ \/\ \/ ___\ \____ \.......//
+//......\ \ \....\/\ \ \ \/ /\ \  ____\...\ \____ \ \ \/ /\ \  /___/\/____\ \......//
+//.......\ \ \..._\ \ \ \  /..\ \ \___/....\/____\ \ \  /..\ \ \.........\ \ \.....//
+//..LSI...\_\ \__\ \ \ \ \ \...\ \ \______....____\ \ \ \...\ \ \.......__\_\ \....//
+//......../\________\ \_\ \_\...\ \_______\../\_____/\ \_\...\ \ \...../\_____/....//
+//........\/________/\/_/\/_/....\/_______/..\/____/..\/_/....\/_/.....\/____/.....//
+//¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯//
+//      LSI          Felipe Moraes - felipemdeoliveira@live.com          LSI       //
+//¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯//
+
+prontera, 182, 200, 4	script	Resetadora::lsi_resetadora	4_F_HIMEL,{
+	function pagaConta; goto(OnClique);
+
+OnInit:
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// CONFIGURAÇÕES
+	/////////////////////////////////////////////////////////////////////////////////////////////
+
+	// Nome do NPC:
+	set .npcNome$, "[^0000BB"+strnpcinfo(0)+"^000000]";
+
+	// Custo para resetar:
+	setarray(.custo,
+		300000,	// Atributos
+		300000, // Habilidades
+		500000  // Ambos (descontinho)
+	);
+
+	// VIP reseta de graça? (1: sim / 0: não)
+	set .deGracaVip, 1;
+
+	// group_id mínimo a ser considerado VIP:
+	set .grupoVip, 1;
+
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// FIM DAS CONFIGURAÇÕES
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	end;
+
+OnClique:
+	mes .npcNome$;
+	mes "Fala aí, "+strcharinfo(0)+"?!";
+	mes "Estou preparada para resetar seus atributos ou habilidades!";
+	if(.deGracaVip == 1 && getgroupid() >= .grupoVip) {
+		mes "Jogadores VIP podem resetar ^00dd00de graça^000000!";
+	} else {
+		mes "O custo é de:";
+		mes "^ff0000"+.custo[0]+"z^000000 para atributos;";
+		mes "^ff0000"+.custo[1]+"z^000000 para habilidades;";
+		mes "^ff0000"+.custo[2]+"z^000000 para ambos;";
+	}
+	mes "O que você quer resetar?";
+	next;
+	switch(select("^FF3355- Atributos:- Habilidades:- Ambos^000000:- Cancelar")) {
+		case 1:
+			mes .npcNome$;
+			if (!pagaConta(.custo[0]))
+				goto(OnSemZeny);
+			resetstatus;
+			mes "^00f000Tudo certo^000000!";
+			mes "Seus atributos foram resetados!";
+			close;
+		case 2:
+			mes .npcNome$;
+			if (!pagaConta(.custo[1]))
+				goto(OnSemZeny);
+			sc_end SC_ALL;
+			resetskill;
+			mes "^00f000Tudo certo^000000!";
+			mes "Suas habilidades foram resetadas!";
+			close;
+		case 3:
+			mes .npcNome$;
+			if (!pagaConta(.custo[2]))
+				goto(OnSemZeny);
+			sc_end SC_ALL;
+			resetskill;
+			resetstatus;
+			mes "^00f000Tudo certo^000000!";
+			mes "Habilidades e atributos resetados!";
+			close;
+		case 4:
+			mes .npcNome$;
+			mes "Tudo bem!";
+			mes "Volte quando precisar dos meus serviços...";
+			close;
+	}
+
+OnSemZeny:
+	mes "Você não tem grana, colega!";
+	mes "Volte quando estiver preparad"+(Sex ? "o" : "a")+"!";
+	close;
+
+	function pagaConta {
+		if (.deGracaVip == 1 && getgroupid() >= .grupoVip)
+			return true; // VIP não paga
+
+		if (Zeny < getarg(0))
+			return false;
+		else {
+			set Zeny, (Zeny-getarg(0));
+			return true;
+		}
+	}
+
+}

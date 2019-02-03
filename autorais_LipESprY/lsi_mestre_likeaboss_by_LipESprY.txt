@@ -1,0 +1,326 @@
+//_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_//
+//... ___.....LSI...........________.......______..................__..__..........//
+//.../\  \................./\  _____\...../ _____\......LSI......./\ \ \ \.........//
+//...\ \_ \.......__  _____\ \ \____/..../\ \____/ ______  __  ___\ \ \_\ \....LSI.//
+//....\//\ \...../\_\/\  __ \ \ \_____...\ \ \____/\  __ \/\ \/ ___\ \____ \.......//
+//......\ \ \....\/\ \ \ \/ /\ \  ____\...\ \____ \ \ \/ /\ \  /___/\/____\ \......//
+//.......\ \ \..._\ \ \ \  /..\ \ \___/....\/____\ \ \  /..\ \ \.........\ \ \.....//
+//..LSI...\_\ \__\ \ \ \ \ \...\ \ \______....____\ \ \ \...\ \ \.......__\_\ \....//
+//......../\________\ \_\ \_\...\ \_______\../\_____/\ \_\...\ \ \...../\_____/....//
+//........\/________/\/_/\/_/....\/_______/..\/____/..\/_/....\/_/.....\/____/.....//
+//¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯//
+//      LSI          Felipe Moraes - felipemdeoliveira@live.com          LSI       //
+//¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯//
+
+prontera, 171, 196, 4	script	Mestra das Classes::LSIMestreClass	4_F_FAIRY1,{
+	function Job_Menu; function A_An; goto(OnClique);
+
+OnInit:
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// CONFIGURAÇÕES
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	set .npcNome$, "[^0000BB"+strnpcinfo(0)+"^000000]";
+	.upar_vip = 1;    		 // Upar jogadores VIP automaticamente? (1: sim / 0: não)
+	.nivel_vip = 1;			 // Número do group_id mínimo para de jogadores considerados VIP;
+	.rebirth_blevel = 99;    // Nível de base mí­nimo para renascer OU mudar para terceira classe
+	.rebirth_jlevel = 50;    // Nível de classe mínimo para renascer OU mudar para terceira classe
+	.jobchange_first = 10;   // Nível de classe mínimo para mudar para 1a classe
+	.jobchange_second = 50;  // Nível de classe mínimo para mudar para 2a classe
+	.third_classes = 0;      // Permitir terceiras classes/classes expandidas? (1: sim / 0: não)
+	.supernovice_level = 45; // Nível de base mínimo para virar um Super Aprendiz
+	.linear_jobchange = 1;   // Forçar a troca linear de classes? (1: sim / 0: não)
+	.skill_point_check = 1;  // Forçar o jogador usar todos os pontos de habilidade? (1: sim / 0: não)
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// FIM DAS CONFIGURAÇÕES
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// SÓ MEXA DAQUI PARA BAIXO SE SOUBER O QUE ESTÁ FAZENDO!
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	setarray .classesIds[1],
+		23, 24, 25, 4008, 4009, 4010,
+		4011, 4012, 4013, 4015, 4016, 4017, 4018,
+		4019, 4020, 4021, 4046, 4047, 4049, 4030,
+		4031, 4032, 4033, 4034, 4035, 4037, 4038,
+		4039, 4040, 4041, 4042, 4043, 4045;
+	setarray .classesNome$[1],
+		"Super aprendiz", "Justiceiro", "Ninja", "Lorde", "Sumo-sacerdote", "Arquimago",
+		"Mestre-ferreiro", "Atirador de Elite", "Algoz", "Paladino", "Mestre", "Professor", "Desordeiro",
+		"Criador", "Menestrel", "Cigana", "Taekwon", "Mestre Taekwon", "Espiritualista", "Mini Cavaleiro",
+		"Mini Arcano", "Mini Bruxo", "Mini Ferreiro", "Mini Caçador", "Mini Mercenário", "Mini Templário", "Mini Monge",
+		"Mini Sóbio", "Mini Arruaceiro", "Mini Alquimísta", "Mini Bardo", "Mini Odalisca", "Mini Super Aprendiz";
+	set .menu$, "- Cancelar!";
+	for (.@i = 1; .@i < getarraysize(.classesIds); .@i++) {
+		set .menu$, .menu$+":- "+.classesNome$[.@i];
+	}
+	end;
+
+OnClique:
+	if ((Class == 0) && (getgroupid() >= .nivel_vip)) {
+		mes .npcNome$;
+		mes "Olá, pequen"+(Sex?"o":"a")+" guerreir"+(Sex?"o":"a")+"!";
+		mes "Percebi que você é um jogador ^ff0000VIP^000000!";
+		mes "Um dos benefícios VIP é transformar na classe que você quiser.";
+		mes "^00bb00Além disso^000000:";
+		mes "- Vou te evoluir ao nível máximo;";
+		mes "- Vou te dar habilidades de platina;";
+		mes "- Vou adicionar todas as suas habilidades!";
+		mes "Então!? Qual classe você deseja se transformar?!";
+		next;
+		while (1 == 1) {
+			set .@selec, (select(.menu$)-1);
+			if (.@selec == 0) {
+				mes .npcNome$;
+				mes "Okay!";
+				mes "Volte quando quiser upar rapidinho! :D";
+				mes " ";
+				mes "Desenvolvido por ^0000AALipESprY^000000.";
+				close;
+			}
+			if ((.classesIds[.@selec] == 4020 || .classesIds[.@selec] == 4042) && Sex == 0) {
+				mes .npcNome$;
+				mes "Você é uma mocinha!";
+				mes "Não pode se tornar um ^990000Menestrel/Mini Bardo^000000!";
+			} else if ((.classesIds[.@selec] == 4021 || .classesIds[.@selec] == 4043) && Sex == 1) {
+				mes .npcNome$;
+				mes "Você é um mocinho!";
+				mes "Não pode se tornar uma ^990000Cigana/Mini Odalisca^000000!";
+			} else {
+				mes .npcNome$;
+				mes "Tem certeza que você deseja se transformar em um"+(Sex?"":"a");
+				mes "[^009000"+.classesNome$[.@selec]+"^000000]?";
+				if (select("- Sim!:- Não, pera!") == 1) {
+					jobchange .classesIds[.@selec];
+					set BaseLevel, 254;
+					set JobLevel, 130;
+					atcommand "@allskills";
+					percentheal 100, 100;
+
+					// Habilidades de platina:
+					skill NV_FIRSTAID, 1, 0;
+					if (BaseClass == Job_Novice) {
+						if (Class != Job_SuperNovice)
+							skill NV_TRICKDEAD, 1, 0;
+					} else if (BaseClass == Job_Swordman) {
+						skill SM_MOVINGRECOVERY, 1, 0;
+						skill SM_FATALBLOW, 1, 0;
+						skill SM_AUTOBERSERK, 1, 0;
+					} else if (BaseClass == Job_Mage) {
+						skill MG_ENERGYCOAT, 1, 0;
+					} else if (BaseClass == Job_Archer) {
+						skill AC_MAKINGARROW, 1, 0;
+						skill AC_CHARGEARROW, 1, 0;
+					} else if (BaseClass == Job_Acolyte) {
+						skill AL_HOLYLIGHT, 1, 0;
+					} else if (BaseClass == Job_Merchant) {
+						skill MC_CARTREVOLUTION, 1, 0;
+						skill MC_CHANGECART, 1, 0;
+						skill MC_LOUD, 1, 0;
+					} else if (BaseClass == Job_Thief) {
+						skill TF_SPRINKLESAND, 1, 0;
+						skill TF_BACKSLIDING, 1, 0;
+						skill TF_PICKSTONE, 1, 0;
+						skill TF_THROWSTONE, 1, 0;
+					}
+
+					if (BaseJob == Job_Knight) {
+						skill KN_CHARGEATK, 1, 0;
+					} else if (BaseJob == Job_Priest) {
+						skill PR_REDEMPTIO, 1, 0;
+					} else if (BaseJob == Job_Wizard) {
+						skill WZ_SIGHTBLASTER, 1, 0;
+					} else if (BaseJob == Job_Blacksmith) {
+						skill BS_UNFAIRLYTRICK, 1, 0;
+						skill BS_GREED, 1, 0;
+					} else if (BaseJob == Job_Hunter) {
+						skill HT_PHANTASMIC, 1, 0;
+					} else if (BaseJob == Job_Assassin) {
+						skill AS_SONICACCEL, 1, 0;
+						skill AS_VENOMKNIFE, 1, 0;
+					} else if (BaseJob == Job_Crusader) {
+						skill CR_SHRINK, 1, 0;
+					} else if (BaseJob == Job_Monk) {
+						skill MO_KITRANSLATION, 1, 0;
+						skill MO_BALKYOUNG, 1, 0;
+					} else if (BaseJob == Job_Sage) {
+						skill SA_CREATECON, 1, 0;
+						skill SA_ELEMENTWATER, 1, 0;
+						skill SA_ELEMENTGROUND, 1, 0;
+						skill SA_ELEMENTFIRE, 1, 0;
+						skill SA_ELEMENTWIND, 1, 0;
+					} else if (BaseJob == Job_Rogue) {
+						skill RG_CLOSECONFINE, 1, 0;
+					} else if (BaseJob == Job_Alchemist) {
+						skill AM_BIOETHICS, 1, 0;
+					} else if (BaseJob == Job_Bard) {
+						skill BA_PANGVOICE, 1, 0;
+					} else if (BaseJob == Job_Dancer) {
+						skill DC_WINKCHARM, 1, 0;
+					}
+
+					next;
+					mes .npcNome$;
+					mes "Agora sim!!!";
+					mes "Tudo pronto para sua nova jornada!";
+					close;
+				}
+			}
+			next;
+		}
+	} else {
+		mes .npcNome$;
+		if (Class > Job_Soul_Linker) {
+			mes "Não há mais classes disponíveis.";
+			mes "Você atingiu a última evolução da sua classe.";
+			close;
+		}
+		if (checkfalcon() || checkcart() || checkmount() || hascashmount()) {
+			mes "Por favor remova "+((checkfalcon())?"o seu falcão":"")+((checkcart())?"o seu carrinho":"")+((checkmount() || hascashmount())?"a sua montaria":"")
+			    +" antes de continuar.";
+			close;
+		}
+		if (.skill_point_check && SkillPoint > 0) {
+			mes "Por favor use todos os seus pontos de habilidade antes de continuar.";
+			close;
+		}
+
+		.@eac = eaclass();
+		.@base = .third_classes ? roclass(.@eac&EAJ_UPPERMASK) : Class;
+		if (.@base >= Job_Knight && .@base <= Job_Crusader2) {
+			if (BaseLevel < .rebirth_blevel || JobLevel < .rebirth_jlevel) {
+				.@blvl = .rebirth_blevel - BaseLevel;
+				.@jlvl = .rebirth_jlevel - JobLevel;
+				mes "Você precisa de mais "
+				    + (BaseLevel < .rebirth_blevel ? ((.rebirth_blevel - BaseLevel) +" níveis de base "+ (JobLevel < .rebirth_jlevel ? "e " : "")) : "")
+				    + (JobLevel < .rebirth_jlevel ? (.rebirth_jlevel - JobLevel) +" níveis de classe " : "")
+				    + "para continuar.";
+				close;
+			}
+			if (Class > Job_Crusader2) {
+				mes "Trocar para terceira classe?";
+				next;
+				Job_Menu(roclass(.@eac|EAJL_THIRD));
+				close;
+			}
+			while (true) {
+				mes "Selecione uma opção.";
+				next;
+				.@choice = select(" ~ ^0055FFRenascer^000000:"+(.third_classes ? " ~ ^FF0000Terceira Classe^000000" : "")+": ~ ^777777Cancelar^000000");
+				if (.@choice == 3)
+					close;
+				mes .npcNome$;
+				mes "Você tem certeza?";
+				next;
+				if (.@choice == 1)
+					Job_Menu(Job_Novice_High);
+				else
+					Job_Menu(roclass(.@eac|EAJL_THIRD));
+				mes .npcNome$;
+			}
+		}
+		.@job1 = roclass(.@eac|EAJL_2_1);
+		.@job2 = roclass(.@eac|EAJL_2_2);
+		if ((.@eac&EAJ_UPPERMASK) == EAJ_SUPER_NOVICE) {
+			.@newclass = roclass(.@eac|EAJL_THIRD);
+			.@required_jlevel = 99;
+		} else if (Class == Job_Ninja || Class == Job_Gunslinger) {
+			.@newclass = .@job1;
+			.@required_jlevel = 70;
+		}
+
+		if (.@eac&EAJL_2)
+			if (.@eac&(EAJL_UPPER|EAJL_BABY) || roclass(.@eac|EAJL_UPPER) == -1) {
+				mes "Não há mais classes disponíveis.";
+				mes "Você atingiu a última evolução da sua classe.";
+				close;
+			}
+		if ((.@eac&EAJ_BASEMASK) == EAJ_NOVICE) {
+			if (JobLevel < .jobchange_first) {
+				mes "É necessário ter um nível de classe igual ou maior que "+.jobchange_first+" para mudar para a 1ª Classe.";
+			} else if (Class == Job_Novice_High && .linear_jobchange && lastJob) {
+				mes "Trocar de classe agora?";
+				next;
+				Job_Menu(roclass((eaclass(lastJob)&EAJ_BASEMASK)|EAJL_UPPER));
+			} else if (Class == Job_Novice) {
+				Job_Menu(Job_Swordman, Job_Mage, Job_Archer, Job_Acolyte, Job_Merchant, Job_Thief,
+				         Job_SuperNovice, Job_Taekwon, Job_Gunslinger, Job_Ninja, Job_Baby);
+			} else if (Class == Job_Novice_High) {
+				Job_Menu(Job_Swordman_High, Job_Mage_High, Job_Archer_High, Job_Acolyte_High, Job_Merchant_High, Job_Thief_High);
+			} else if (Class == Job_Baby) {
+				Job_Menu(Job_Baby_Swordman, Job_Baby_Mage, Job_Baby_Archer, Job_Baby_Acolyte, Job_Baby_Merchant, Job_Baby_Thief,
+				         Job_Super_Baby);
+			} else {
+				mes "Um erro aconteceu.";
+			}
+			close;
+		}
+		if (roclass(.@eac|EAJL_2_1) == -1 || roclass(.@eac|EAJL_2_2) == -1) {
+			mes "Não há mais classes disponíveis.";
+			mes "Você atingiu a última evolução da sua classe.";
+		} else if (!(.@eac&EAJL_2) && JobLevel < .jobchange_second) {
+			mes "É necessário ter um nível de classe igual ou maior a "+.jobchange_second+" para mudar para a 2ª Classe.";
+		} else if (.linear_jobchange && lastJob && (.@eac&EAJL_UPPER)) {
+			mes "Trocar de classe agora?";
+			next;
+			Job_Menu(lastJob+Job_Novice_High);
+		} else {
+			Job_Menu(.@job1, .@job2);
+		}
+		close;
+	}
+	close; // Prevenção
+
+	function Job_Menu {
+		while (true) {
+			if (getargcount() > 1) {
+				mes "Selecione uma classe.";
+				.@menu$ = "";
+				for (.@i = 0; .@i < getargcount(); ++.@i)
+					.@menu$ += " ~ "+jobname(getarg(.@i))+":";
+				.@menu$ += " ~ ^777777Cancel^000000";
+				next;
+				.@newjob = getarg(select(.@menu$)-1, 0);
+				if (!.@newjob) close;
+				if ((.@newjob == Job_SuperNovice || .@newjob == Job_Super_Baby) && BaseLevel < .supernovice_level) {
+					mes .npcNome$;
+					mes "É necessário ter um nível de base igual ou maior a "+.supernovice_level+" para virar um "+jobname(.@newjob)+".";
+					close;
+				}
+				mes .npcNome$;
+				mes "Você tem certeza?";
+				next;
+			} else {
+				.@newjob = getarg(0);
+			}
+			if (select(" ~ Mudar para a classe ^0055FF"+jobname(.@newjob)+"^000000: ~ ^777777"+(getargcount() > 1 ? "Voltar" : "Cancelar")+"^000000") == 1) {
+				mes .npcNome$;
+				mes "Você agora é um "+A_An(jobname(.@newjob))+"!";
+				if (.@newjob == Job_Novice_High && .linear_jobchange)
+					lastJob = Class; // Nota: Isso Ã© incompatÃ­vel com o script de renascimento da ValquÃ­ria
+				jobchange .@newjob;
+				if (.@newjob == Job_Novice_High)
+					resetlvl(1);
+				if (.@newjob == Job_Baby) {
+					resetlvl(4);
+					SkillPoint = 0;
+				}
+				specialeffect2 EF_ANGEL2;
+				specialeffect2 EF_ELECTRIC;
+				close;
+			}
+			if (getargcount() == 1)
+				return;
+			mes .npcNome$;
+		}
+		end;
+	}
+
+	function A_An {
+		setarray .@vowels$, "a", "e", "i", "o", "u";
+		.@firstletter$ = strtolower(charat(getarg(0), 0));
+		for (.@i = 0; .@i < getarraysize(.@vowels); ++.@i) {
+			if (.@vowels$[.@i] == .@firstletter$)
+				return "an "+getarg(0);
+		}
+		return "a "+getarg(0);
+	}
+
+}

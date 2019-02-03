@@ -1,0 +1,221 @@
+//_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_//
+//... ___.....LSI...........________.......______..................__..__..........//
+//.../\  \................./\  _____\...../ _____\......LSI......./\ \ \ \.........//
+//...\ \_ \.......__  _____\ \ \____/..../\ \____/ ______  __  ___\ \ \_\ \....LSI.//
+//....\//\ \...../\_\/\  __ \ \ \_____...\ \ \____/\  __ \/\ \/ ___\ \____ \.......//
+//......\ \ \....\/\ \ \ \/ /\ \  ____\...\ \____ \ \ \/ /\ \  /___/\/____\ \......//
+//.......\ \ \..._\ \ \ \  /..\ \ \___/....\/____\ \ \  /..\ \ \.........\ \ \.....//
+//..LSI...\_\ \__\ \ \ \ \ \...\ \ \______....____\ \ \ \...\ \ \.......__\_\ \....//
+//......../\________\ \_\ \_\...\ \_______\../\_____/\ \_\...\ \ \...../\_____/....//
+//........\/________/\/_/\/_/....\/_______/..\/____/..\/_/....\/_/.....\/____/.....//
+//¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯//
+//      LSI          Felipe Moraes - felipemdeoliveira@live.com          LSI       //
+//¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯//
+
+prontera, 182, 209, 3	script	Habilidades de Platina::lsi_skill_platina	4_M_ROKI,{
+	function addSkill; function pagaConta; goto(OnClique);
+
+OnInit:
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// CONFIGURAÇÕES
+	/////////////////////////////////////////////////////////////////////////////////////////////
+
+	// Nome do NPC
+	set .npcNome$, "[^000099"+strnpcinfo(0)+"^000000]";
+
+	// Custo para adquirir as habilidades em Zenys (custo único para todas)
+	set .custoSkills, 5000000; // 5kk
+
+	// VIP adquire de graça? (1: sim / 0: não)
+	set .deGracaVip, 1;
+
+	// group_id mínimo a ser considerado VIP:
+	set .grupoVip, 1;
+
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// FIM DAS CONFIGURAÇÕES
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	end;
+
+OnClique:
+	mes .npcNome$;
+	mes "Fala aí, "+strcharinfo(0)+"!";
+	mes "Eu posso lhe fornecer as suas habilidades de platina sem nenhuma quest!";
+
+	if (.deGracaVip == 1 && getgroupid() >= .grupoVip)
+		mes "Jogadores VIP podem adquirir ^00dd00todas de graça^000000!";
+	else
+		mes "O custo é de ^ff0000"+.custoSkills+"z^000000!";
+
+	mes "Quer adquirir agora?";
+	next;
+	if (select("- Claro, manda pra cá:- Não, valeu") == 2) {
+		mes .npcNome$;
+		mes "Tudo bem!";
+		mes "Estarei aqui se mudar de ideia...";
+		close;
+	}
+
+	if (.deGracaVip == 1 && getgroupid() >= .grupoVip) {
+		if (addSkill())
+			goto(OnSkillAdd);
+		else
+			goto(OnSkillJaTem);
+	} else {
+		if (Zeny < .custoSkills) {
+			mes .npcNome$;
+			mes "Você está sem grana, colega!";
+			mes "Volte quando estiver mais preparado...";
+			close;
+		}
+		if (addSkill())
+			goto(OnSkillAdd);
+		else
+			goto(OnSkillJaTem);
+	}
+	close;
+
+OnSkillAdd:
+	pagaConta(.custoSkills);
+	mes .npcNome$;
+	mes "Aí está!";
+	mes "Você está pronto para usufruir de suas habilidades de platina!";
+	close;
+
+OnSkillJaTem:
+	mes .npcNome$;
+	mes "Vá com calma!";
+	mes "Você já tem todas as suas habilidades de platina!";
+	close;
+
+	function pagaConta {
+		if (.deGracaVip == 1 && getgroupid() >= .grupoVip)
+			return;
+		set(Zeny, (Zeny-getarg(0)));
+			return;
+	}
+
+	function addSkill {
+		switch(BaseJob){
+			case Job_Novice:
+				setarray(.@skills,
+					142, 143
+				);
+				break;
+			case Job_Swordman:
+				setarray(.@skills,
+					144, 145, 146
+				);
+				break;
+			case Job_Mage:
+				setarray(.@skills,
+					157
+				);
+				break;
+			case Job_Archer:
+				setarray(.@skills,
+					147, 148
+				);
+				break;
+			case Job_Acolyte:
+				setarray(.@skills,
+					156
+				);
+				break;
+			case Job_Merchant:
+				setarray(.@skills,
+					153, 154, 155
+				);
+				break;
+			case Job_Thief:
+				setarray(.@skills,
+					149, 150, 151, 152
+				);
+				break;
+			case Job_Knight:
+				setarray(.@skills,
+					144, 145, 146, 1001
+				);
+				break;
+			case Job_Priest:
+				setarray(.@skills,
+					156, 1014
+				);
+				break;
+			case Job_Wizard:
+				setarray(.@skills,
+					157, 1006
+				);
+				break;
+			case Job_Blacksmith:
+				setarray(.@skills,
+					153, 154, 155, 1012, 1013
+				);
+				break;
+			case Job_Hunter:
+				setarray(.@skills,
+					147, 148, 1009
+				);
+				break;
+			case Job_Assassin:
+				setarray(.@skills,
+					149, 150, 151, 152, 1003, 1004
+				);
+				break;
+			case Job_Crusader:
+				setarray(.@skills,
+					144, 145, 146, 1002
+				);
+				break;
+			case Job_Monk:
+				setarray(.@skills,
+					156, 1015, 1016
+				);
+				break;
+			case Job_Sage:
+				setarray(.@skills,
+					157, 1007
+				);
+				break;
+			case Job_Rogue:
+				setarray(.@skills,
+					149, 150, 151, 152, 1005
+				);
+				break;
+			case Job_Alchem:
+				setarray(.@skills,
+					153, 154, 155, 238
+				);
+				break;
+			case Job_Bard:
+				setarray(.@skills,
+					147,148,1010
+				);
+				break;
+			case Job_Dancer:
+				setarray(.@skills,
+					147, 148, 1011
+				);
+				break;
+			default:
+				mes .npcNome$;
+				mes "Pera aí!";
+				mes "Acho que não tenho nenhuma habilidade de platina para sua classe...";
+				close;
+		} // switch
+
+		set(.@semAlgumaSkill, 0);
+		for (.@i = 0; .@i < getarraysize(.@skills); .@i++) {
+			if (!getskilllv(.@skills[.@i])) {
+				skill(.@skills[.@i], 1, 0);
+				set(.@semAlgumaSkill, 1);
+			}
+		}
+
+		if (.@semAlgumaSkill == 1)
+			return true;
+		else
+			return false;
+
+	} // function
+}

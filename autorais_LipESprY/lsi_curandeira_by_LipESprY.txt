@@ -1,0 +1,136 @@
+//_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_//
+//... ___.....LSI...........________.......______..................__..__..........//
+//.../\  \................./\  _____\...../ _____\......LSI......./\ \ \ \.........//
+//...\ \_ \.......__  _____\ \ \____/..../\ \____/ ______  __  ___\ \ \_\ \....LSI.//
+//....\//\ \...../\_\/\  __ \ \ \_____...\ \ \____/\  __ \/\ \/ ___\ \____ \.......//
+//......\ \ \....\/\ \ \ \/ /\ \  ____\...\ \____ \ \ \/ /\ \  /___/\/____\ \......//
+//.......\ \ \..._\ \ \ \  /..\ \ \___/....\/____\ \ \  /..\ \ \.........\ \ \.....//
+//..LSI...\_\ \__\ \ \ \ \ \...\ \ \______....____\ \ \ \...\ \ \.......__\_\ \....//
+//......../\________\ \_\ \_\...\ \_______\../\_____/\ \_\...\ \ \...../\_____/....//
+//........\/________/\/_/\/_/....\/_______/..\/____/..\/_/....\/_/.....\/____/.....//
+//¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯//
+//      LSI          Felipe Moraes - felipemdeoliveira@live.com          LSI       //
+//¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯//
+
+prontera, 162, 201, 3	script	Curandeira::lsi_curandeira	4_MAL_KAFRA, 20, 20,{ goto(OnClique);
+
+OnInit:
+
+	//========================================
+	// CONFIGURAÇÕES
+	//========================================
+	// HABILITAR CURA?
+	// 0: NÃO / 1: SIM
+	set .cura, 1;
+	//========================================
+	// HABILITAR BUFFS?
+	// 0: NÃO / 1: SIM
+	set .buffs, 1;
+	//========================================
+	// ID MÍNIMO DO GRUPO PARA BUFFS ESPECIAIS (LEVEL GM)
+	// 0: TODOS OS JOGADORES
+	set .buffsPremium, 1;
+	//========================================
+	// TEMPO DE DURAÇÃO DOS BUFFS
+	// EM MILISSEGUNDOS
+	set .buffsTempo, 1200000; // 20 minutos
+	//========================================
+	// HABILITAR REPARO DE EQUIPAMENTOS?
+	// 0: NÃO / 1: SIM
+	set .reparar, 1;
+	//========================================
+	// TEMPO MÍNIMO PARA USAR NOVAMENTE (EM SEGUNDOS)
+	// 0: DESATIVA
+	set .delayTime, 300;
+	//========================================
+	// MAPAS QUE NÃO PODEM SER UTILIZADOS O COMANDO
+	setarray .mapBlackList$,
+		// CASTELOS - GUERRA DO EMPERIUM
+		"prtg_cas01","prtg_cas02","prtg_cas03","prtg_cas04","prtg_cas05",
+		"payg_cas01","payg_cas02","payg_cas03","payg_cas04","payg_cas05",
+		"gefg_cas01","gefg_cas02","gefg_cas03","gefg_cas04","gefg_cas05",
+		"aldeg_cas01","aldeg_cas02","aldeg_cas03","aldeg_cas04","aldeg_cas05",
+		"schg_cas01","schg_cas02","schg_cas03","schg_cas04","schg_cas05",
+		"arug_cas01","arug_cas02","arug_cas03","arug_cas04","arug_cas05",
+		// PVPs ORIGINAIS
+		"pvp_y_1-1", "pvp_y_2-1", "pvp_y_3-1", "pvp_y_4-1", "pvp_y_5-1", "pvp_y_6-1", "pvp_y_7-1", "pvp_y_8-1",
+		"pvp_y_1-2", "pvp_y_2-2", "pvp_y_3-2", "pvp_y_4-2", "pvp_y_5-2", "pvp_y_6-2", "pvp_y_7-2", "pvp_y_8-2",
+		"pvp_y_1-3", "pvp_y_2-3", "pvp_y_3-3", "pvp_y_4-3", "pvp_y_5-3", "pvp_y_6-3", "pvp_y_7-3", "pvp_y_8-3",
+		"pvp_y_1-4", "pvp_y_2-4", "pvp_y_3-4", "pvp_y_4-4", "pvp_y_5-4", "pvp_y_6-4", "pvp_y_7-4", "pvp_y_8-4",
+		"pvp_y_1-5", "pvp_y_2-5", "pvp_y_3-5", "pvp_y_4-5", "pvp_y_5-5", "pvp_y_6-5", "pvp_y_7-5", "pvp_y_8-5",
+		// OUTROS
+		"new_1-1",
+		"pvp_n_1-5",
+		"guild_vs1",
+		"lhz_dun04",
+		"prt_are01";
+	//========================================
+	// FIM DAS CONFIGURAÇÕES
+	//========================================
+	end;
+
+OnCommandEvent:
+	set .@mapa_restrito, 0;
+	for(.@i = 0; .@i < getarraysize(.mapBlackList$); ++.@i ) {
+		if(strcharinfo(3) == .mapBlackList$[.@i]) {
+			set .@mapa_restrito, 1;
+			break;
+		}
+	}
+	if(.@mapa_restrito != 0) {
+		dispbottom "Este comando não pode ser utilizado neste mapa!";
+	} else if (.delayTime > 0 && lsibuff_delay > gettimetick(2)) {
+		dispbottom "Você pode curar-se apenas uma vez a cada "+(.delayTime/60)+" minutos ou após morrer.";
+	} else {
+
+	OnTouch:
+	OnClique:
+
+		if (.cura != 0) {
+			percentheal 100, 100;
+		}
+		if (.buffs != 0) {
+			sc_start 32, .buffsTempo, 10;
+			sc_start 30, .buffsTempo, 10;
+			skilleffect 34,0;
+			skilleffect 29,0;
+
+			if( getgroupid() >= .buffsPremium) {
+				sc_start SC_FOOD_STR, .buffsTempo, 10;
+				sc_start SC_FOOD_AGI, .buffsTempo, 10;
+				sc_start SC_FOOD_VIT, .buffsTempo, 10;
+				sc_start SC_FOOD_INT, .buffsTempo, 10;
+				sc_start SC_FOOD_DEX, .buffsTempo, 10;
+				sc_start SC_FOOD_LUK, .buffsTempo, 10;
+				sc_start 41, .buffsTempo, 5;
+				sc_start 40, .buffsTempo, 5;
+			}
+		}
+		if (.reparar != 0 && getbrokencount() > 0) {
+			repairall;
+		}
+		if(.delayTime > 0) {
+			set lsibuff_delay, gettimetick(2)+.delayTime;
+		}
+	}
+	end;
+
+OnPCDieEvent:
+	set lsibuff_delay, 0;
+	end;
+}
+
+-	script	CurandeiraCMD::lsi_curandeira_cmd	FAKE_NPC,{
+	end;
+	OnInit:
+		bindatcmd("buff", "lsi_curandeira::OnCommandEvent", 0, 99, false);
+		bindatcmd("buffs", "lsi_curandeira::OnCommandEvent", 0, 99, false);
+	end;
+}
+
+// WOE - FEUDO PRONTERA
+prt_gld, 149, 142, 5	duplicate(lsi_curandeira)	Curandeira::lsi_curandeira_fad	4_MAL_KAFRA, 20, 20
+prt_gld, 146, 60, 4	duplicate(lsi_curandeira)	Curandeira::lsi_curandeira_kri	4_MAL_KAFRA, 20, 20
+prt_gld, 237, 134, 5	duplicate(lsi_curandeira)	Curandeira::lsi_curandeira_swan	4_MAL_KAFRA, 20, 20
+prt_gld, 203, 242, 4	duplicate(lsi_curandeira)	Curandeira::lsi_curandeira_gond	4_MAL_KAFRA, 20, 20
+prt_gld, 116, 243, 4	duplicate(lsi_curandeira)	Curandeira::lsi_curandeira_skoe	4_MAL_KAFRA, 20, 20

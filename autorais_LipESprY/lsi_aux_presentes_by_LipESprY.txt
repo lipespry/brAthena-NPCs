@@ -1,0 +1,99 @@
+//_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_//
+//... ___.....LSI...........________.......______..................__..__..........//
+//.../\  \................./\  _____\...../ _____\......LSI......./\ \ \ \.........//
+//...\ \_ \.......__  _____\ \ \____/..../\ \____/ ______  __  ___\ \ \_\ \....LSI.//
+//....\//\ \...../\_\/\  __ \ \ \_____...\ \ \____/\  __ \/\ \/ ___\ \____ \.......//
+//......\ \ \....\/\ \ \ \/ /\ \  ____\...\ \____ \ \ \/ /\ \  /___/\/____\ \......//
+//.......\ \ \..._\ \ \ \  /..\ \ \___/....\/____\ \ \  /..\ \ \.........\ \ \.....//
+//..LSI...\_\ \__\ \ \ \ \ \...\ \ \______....____\ \ \ \...\ \ \.......__\_\ \....//
+//......../\________\ \_\ \_\...\ \_______\../\_____/\ \_\...\ \ \...../\_____/....//
+//........\/________/\/_/\/_/....\/_______/..\/____/..\/_/....\/_/.....\/____/.....//
+//¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯//
+//      LSI          Felipe Moraes - felipemdeoliveira@live.com          LSI       //
+//¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯//
+///////////LSI/////////////////     Ragnarok NPC     \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\//
+//----------------------------"Auxiliar de presentes"------------------------------//
+//¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯//
+//                                                                                 //
+// • Criado por: Felipe "LipESprY" Moraes - felipemdeoliveira@live.com             //
+// • Funcionalidades:                                                              //
+//		Abre caixas de presente até atingir 90% de peso ou acabar as caixas;       //
+//		NPC é desabilitado durante as guerras do emperium.                         //
+//                                                                                 //
+// • Script dedicado ao servidor DarkSideRO (DSRO) (www.dsro.com.br) hr 254/130;   //
+//                                                                                 //
+//               ~~ Este script foi testado no emulador: Hercules v2017.12.17 ~~   //
+//               ~~ Este script foi testado no emulador: brAthena [final]          //
+//¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯//
+
+prontera, 161, 220, 4	script	Auxiliar de presentes::lsi_abridor_de_caixas	4_NONMYSTCASE,{
+	function checkPeso90; function getPresente;
+
+	//////////////////////////////////////////////// ADICIONE OS IDS DAS CAIXAS AQUI:
+	setarray .@caixasid[0], 603, 617, 644;
+	/////////////////////////////////////////////////////////////////////////////////
+
+	mes "[^0000ff" + strnpcinfo(0)+ "^000000]";
+	if (agitcheck() || agitcheck2()) {
+		mes "Estamos em guerra! Não posso ajudá-lo durante esse período!";
+		mes " ";
+		mes "^b25900Volte após o término da Guerra do Emperium.^000000";
+		close;
+	}
+	mes "Uauu!!!! Já imaginou se pudesse abrir ^995050TODAS^000000 as suas caixas de uma só vez?!";
+	mes "Então! Posso fazer isso por você...";
+	mes "^309930Quer abrir as suas caixas?^000000";
+	next;
+	.@menu$ = "Não, por enquanto!:";
+	for(set .@i,0; .@i <= (getarraysize(.@caixasid)-1); set .@i,.@i+1) {
+		set .@menu$, .@menu$+"^993030Abrir^000000 " + getitemname(.@caixasid[.@i]) + ":";
+	}
+	.@item = select(.@menu$);
+	if (.@item == 1) {
+		mes "[^0000ff" + strnpcinfo(0)+ "^000000]";
+		mes "Ok! Volte quando precisar de meus serviços!";
+		mes " ";
+		mes " ";
+		mes "Desenvolvido por ^0000ddLipESprY^000000 dedicado ao ^700000DSRO^000000.";
+		close;
+	} else {
+		.@selecId = .@caixasid[(.@item-2)];
+		mes "[^0000ff" + strnpcinfo(0)+ "^000000]";
+		if( countitem(.@selecId) > 0 ) {
+			mes "Vamos abrir a caixa ^309930" + getitemname(.@selecId) + "^000000.";
+		} else {
+			mes "^992020Você não tem nenhuma " + getitemname(.@selecId) + "!^000000";
+			close;
+		}
+		next;
+		freeloop(true);
+		while (checkPeso90() == false && countitem(.@selecId) > 0) {
+			getPresente(.@selecId);
+		}
+		freeloop(false);
+		mes "[^0000ff" + strnpcinfo(0)+ "^000000]";
+		if(checkPeso90()) {
+			mes "Seu inventário está cheio ou você atingiu 90% do peso máximo!";
+			mes "Guarde alguns itens para continuarmos.";
+		} else {
+			mes "Todas as caixas foram abertas!";
+			mes "Volte quando precisar dos meus serviços.";
+		}
+		close;
+	}
+
+	function getPresente {
+		getrandgroupitem(getarg(0), 1);
+		delitem(getarg(0), 1);
+		return true;
+	}
+	function checkPeso90 {
+		getinventorylist;
+		if (@inventorylist_count > 99 || Weight > ((MaxWeight / 100) * 90)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+}

@@ -1,0 +1,105 @@
+//_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_//
+//... ___.....LSI...........________.......______..................__..__..........//
+//.../\  \................./\  _____\...../ _____\......LSI......./\ \ \ \.........//
+//...\ \_ \.......__  _____\ \ \____/..../\ \____/ ______  __  ___\ \ \_\ \....LSI.//
+//....\//\ \...../\_\/\  __ \ \ \_____...\ \ \____/\  __ \/\ \/ ___\ \____ \.......//
+//......\ \ \....\/\ \ \ \/ /\ \  ____\...\ \____ \ \ \/ /\ \  /___/\/____\ \......//
+//.......\ \ \..._\ \ \ \  /..\ \ \___/....\/____\ \ \  /..\ \ \.........\ \ \.....//
+//..LSI...\_\ \__\ \ \ \ \ \...\ \ \______....____\ \ \ \...\ \ \.......__\_\ \....//
+//......../\________\ \_\ \_\...\ \_______\../\_____/\ \_\...\ \ \...../\_____/....//
+//........\/________/\/_/\/_/....\/_______/..\/____/..\/_/....\/_/.....\/____/.....//
+//¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯//
+//      LSI          Felipe Moraes - felipemdeoliveira@live.com          LSI       //
+//¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯//
+
+prontera, 186, 205, 4	script	Garota Negociante::lsi_breeder	4_F_LUCILE,{ function pagaConta; goto(OnClique);
+
+OnInit:
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// CONFIGURAÇÕES
+	/////////////////////////////////////////////////////////////////////////////////////////////
+
+	// Nome do NPC
+	set .npcNome$, "[^000099"+strnpcinfo(0)+"^000000]";
+
+	// Custo de cada concessão
+	set .custo, 100000; // 100k
+
+	// VIP adquire de graça? (1: sim / 0: não)
+	set .deGracaVip, 1;
+
+	// group_id mínimo a ser considerado VIP:
+	set .grupoVip, 1;
+
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// FIM DAS CONFIGURAÇÕES
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	end;
+
+OnClique:
+
+	mes .npcNome$;
+	mes "Como vai, "+strcharinfo(0)+"?";
+	mes "Posso lhe conceder ^00dd00Montarias^000000, ^00dd00Falcões^000000 e ^00dd00Carrinhos^000000...";
+	mes "Só depende da sua habilidade de manuseá-los...";
+
+	if (.deGracaVip == 1 && getgroupid() >= .grupoVip)
+		mes "E é claro que jogadores VIP podem adquirir ^00dd00tudo de graça^000000!";
+	else
+		mes "E é claro que tem um custo de ^ff0000"+.custo+"z^000000...";
+
+	next;
+	if (select("- Quero sim!:- Não, valeu...") == 2) {
+		mes .npcNome$;
+		mes "Você que sabe...";
+		close;
+	}
+
+	if (.deGracaVip == 1 && getgroupid() >= .grupoVip)
+		goto(OnAddOsBang);
+	else {
+		if (Zeny < .custo) {
+			mes .npcNome$;
+			mes "Você está sem grana, colega!";
+			mes "Volte quando estiver mais preparado...";
+			close;
+		}
+		goto(OnAddOsBang);
+	}
+
+OnAddOsBang:
+	set(.@addAlgo, 0);
+	if (!checkcart() && getskilllv(39)) {
+		setcart();
+		set(.@addAlgo, 1);
+	}
+
+	if (!checkmount() && (getskilllv(63) || getskilllv(2255))) {
+		setmount();
+		set(.@addAlgo, 1);
+	}
+
+	if (!checkfalcon() && getskilllv(127)) {
+		setfalcon();
+		set(.@addAlgo, 1);
+	}
+
+	mes .npcNome$;
+
+	if (.@addAlgo == 1) {
+		mes "Lhe dei tudo de acordo com suas habilidades!";
+		pagaConta(.custo);
+	} else
+		mes "Não tenho nada diferente para suas habilidades...";
+
+	mes "Até breve!";
+	close;
+
+	function pagaConta {
+		if (.deGracaVip == 1 && getgroupid() >= .grupoVip)
+			return; // VIP não paga
+
+		set(Zeny, (Zeny-getarg(0)));
+		return;
+	}
+}
