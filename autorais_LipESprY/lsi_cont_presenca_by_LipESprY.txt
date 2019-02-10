@@ -1,0 +1,79 @@
+//_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_//
+//... ___.....LSI...........________.......______..................__..__..........//
+//.../\  \................./\  _____\...../ _____\......LSI......./\ \ \ \.........//
+//...\ \_ \.......__  _____\ \ \____/..../\ \____/ ______  __  ___\ \ \_\ \....LSI.//
+//....\//\ \...../\_\/\  __ \ \ \_____...\ \ \____/\  __ \/\ \/ ___\ \____ \.......//
+//......\ \ \....\/\ \ \ \/ /\ \  ____\...\ \____ \ \ \/ /\ \  /___/\/____\ \......//
+//.......\ \ \..._\ \ \ \  /..\ \ \___/....\/____\ \ \  /..\ \ \.........\ \ \.....//
+//..LSI...\_\ \__\ \ \ \ \ \...\ \ \______....____\ \ \ \...\ \ \.......__\_\ \....//
+//......../\________\ \_\ \_\...\ \_______\../\_____/\ \_\...\ \ \...../\_____/....//
+//........\/________/\/_/\/_/....\/_______/..\/____/..\/_/....\/_/.....\/____/.....//
+//¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯//
+//      LSI          Felipe Moraes - felipemdeoliveira@live.com          LSI       //
+//¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯//
+//                            Dedicado ao gOld-RO                                  //
+//¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯//
+-	script	lsi_cont_presenca	-1,{
+OnInit:
+
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// CONFIGURAÇÕES
+	/////////////////////////////////////////////////////////////////////////////////////////////
+
+	// De quanto em quantos minutos ganha os ROPs?
+	// Exemplo:
+	// 20: vinte minutos / 30: meia hora / 60: uma hora / 120: duas horas
+	set .tempoPremiar, 30;
+
+	// Quantos ROPs ganha a cada premiação?
+	// Exemplo:
+	// 1: um ROP / 10: dez ROPs / ...
+	set .ropsPremiar, 4;
+
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// FIM DAS CONFIGURAÇÕES
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	end;
+
+OnPCLoginEvent:
+	sleep2(5000);
+	message(strcharinfo(0), "[Cont. de presença ativado]");
+	attachnpctimer ""+strcharinfo(0)+"";
+	initnpctimer;
+	end;
+
+OnPCLogOutEvent:
+	stopnpctimer;
+	set(@minutosOn, 0);
+	end;
+
+OnTimer1000:
+	if (checkvending() == 0) {
+		set(@minutosOn, (@minutosOn+1));
+		if (@minutosOn == .tempoPremiar) {
+			// Zera o contador
+			set(@minutosOn, 0);
+			// Recebe premiação
+			set #CASHPOINTS, (#CASHPOINTS+.ropsPremiar);
+			// Avisar o jogador que recebeu o prêmio da presença
+			message(
+				strcharinfo(0),
+				(
+					"[Presença] Você recebeu ["
+					+.ropsPremiar
+					+"] ROPs por ficar "
+					+.tempoPremiar
+					+" minutos online."
+				)
+				);
+		}
+	} else {
+		// Se o cara estiver vendendo (normal ou autotrade), para de monitorar
+		// Tira a carga do servidor...
+		stopnpctimer;
+		end;
+	}
+	stopnpctimer;
+	initnpctimer;
+	end;
+}
