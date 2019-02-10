@@ -1,0 +1,95 @@
+//_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_//
+//... ___.....LSI...........________.......______..................__..__..........//
+//.../\  \................./\  _____\...../ _____\......LSI......./\ \ \ \.........//
+//...\ \_ \.......__  _____\ \ \____/..../\ \____/ ______  __  ___\ \ \_\ \....LSI.//
+//....\//\ \...../\_\/\  __ \ \ \_____...\ \ \____/\  __ \/\ \/ ___\ \____ \.......//
+//......\ \ \....\/\ \ \ \/ /\ \  ____\...\ \____ \ \ \/ /\ \  /___/\/____\ \......//
+//.......\ \ \..._\ \ \ \  /..\ \ \___/....\/____\ \ \  /..\ \ \.........\ \ \.....//
+//..LSI...\_\ \__\ \ \ \ \ \...\ \ \______....____\ \ \ \...\ \ \.......__\_\ \....//
+//......../\________\ \_\ \_\...\ \_______\../\_____/\ \_\...\ \ \...../\_____/....//
+//........\/________/\/_/\/_/....\/_______/..\/____/..\/_/....\/_/.....\/____/.....//
+//¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯//
+//      LSI          Felipe Moraes - felipemdeoliveira@live.com          LSI       //
+//¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯//
+//                            Dedicado ao gOld-RO                                  //
+//¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯-¯//
+
+-	script	lsi_drop_caveira	-1,{
+
+OnInit:
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// CONFIGURAÇÕES
+	/////////////////////////////////////////////////////////////////////////////////////////////
+
+	// Mapas que dropa caveira:
+	setarray(.mapas$,
+		"amatsu", "pvp_n_1-3", "pvp_n_1-5"
+	);
+
+	// Anunciar quando cometer suicídio ou for morto por outro jogador?
+	// 1: sim / 0: não
+	set(.anunciar, 1);
+
+	// Cravar o nome do jogador na caveira?
+	// 1: sim / 0: não
+	set(.nomeNaCaveira, 1);
+
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// FIM DAS CONFIGURAÇÕES
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	end;
+
+OnPCKillEvent:
+	getmapxy(.@mapaAtual$, .@x, .@y, 0);
+
+	set(.@mapaCaveira, 0);
+	for (.@i = 0; .@i < getarraysize(.mapas$); .@i++) {
+		if (.@mapaAtual$ == .mapa$[.@i]) {
+			set(.@mapaCaveira, 1);
+			break;
+		}
+	}
+
+	if (.@mapaCaveira == 1) {
+		if (rid2name(killedrid) == strcharinfo(0)) {
+			// Anuncia suicídio - não recebe a cabeira
+			if (.anunciar == 1)
+				mapannounce(
+					.@mapaAtual$,
+					"O Jogador ["+strcharinfo(0)+"] cometeu suicídio...",
+					bc_blue
+				);
+		} else {
+			// Anuncia no mapa - conforme configuração
+			if (.anunciar == 1)
+				mapannounce(
+					.@mapaAtual$,
+					(
+						"O Jogador ["
+						+strcharinfo(0)
+						+"] matou o jogador ["
+						+rid2name(killedrid)
+						+"]."
+					),
+					bc_blue
+				);
+
+			// Recebe a caveira
+
+			// com o nome do morto
+			if (.nomeNaCaveira == 1)
+				getnameditem(
+					7420,
+					getcharid(
+						0,
+						rid2name(killedrid)
+					)
+				);
+
+			// ou sem o nome do morto
+			else
+				getitem(7420, 1);
+		}
+	}
+	end;
+}
