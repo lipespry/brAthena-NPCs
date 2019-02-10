@@ -44,7 +44,7 @@ OnPCKillEvent:
 
 	set(.@mapaCaveira, 0);
 	for (.@i = 0; .@i < getarraysize(.mapas$); .@i++) {
-		if (.@mapaAtual$ == .mapa$[.@i]) {
+		if (.@mapaAtual$ == .mapas$[.@i]) {
 			set(.@mapaCaveira, 1);
 			break;
 		}
