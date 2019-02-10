@@ -47,7 +47,7 @@ OnPCLogOutEvent:
 	set(@minutosOn, 0);
 	end;
 
-OnTimer1000:
+OnTimer60000:
 	if (checkvending() == 0) {
 		set(@minutosOn, (@minutosOn+1));
 		if (@minutosOn == .tempoPremiar) {
